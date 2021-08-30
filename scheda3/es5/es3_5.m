@@ -1,0 +1,30 @@
+clear
+
+a = 1; b = 5;
+n_nodes = 4;
+
+F = @(x) sin(x)+cos(x);
+
+I = closed_Newton_Cotes(a,b,n_nodes,F);
+title(sprintf('interpolating %s with %d nodes',...
+    strrep(char(F),'@(x)',''),n_nodes))
+legend(strrep(char(F),'@(x)',''),'approx')
+fprintf("approximate integral %d\n",I);
+
+% calculate dop
+for n_nodes = 2:4
+    mistake = false;
+    dop = -1;
+    while ~mistake
+        F = @(x) x.^(dop+1);
+        I = closed_Newton_Cotes(a,b,n_nodes,F,false);
+        I_true = (b^(dop+2)-a^(dop+2))/(dop+2);
+        
+        if abs(I - I_true) < 10^(-8) % check approx integral
+            dop = dop + 1;
+        else
+            mistake = true;
+        end
+    end
+    fprintf("formula for %d nodes, dop = %d\n",n_nodes,dop);
+end
